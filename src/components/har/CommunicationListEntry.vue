@@ -16,9 +16,15 @@ export default {
     isDataUrl() {
       return this.entry.request?.url?.startsWith('data:');
     },
-    responseSize() {
-      return this.entry.response?.bodySize || this.entry.response?.content?.size || 0;
-    }
+    headersSize() {
+      return Math.max(0, this.entry.request.headersSize ?? 0) + Math.max(0, this.entry.response?.headersSize ?? 0);
+    },
+    requestBodySize() {
+      return this.entry.request._content?.size ?? this.entry.request.postData?._size ?? this.entry.request.bodySize ?? 0;
+    },
+    responseBodySize() {
+      return Math.max(0, this.entry.response?.content?.size ?? this.entry.response?.bodySize ?? 0);
+    },
   }
 }
 </script>
@@ -37,7 +43,7 @@ export default {
           Blocked
         </span>
         <span class="ms-1 text-unmuted" v-else>
-          {{ $humanFileSize(entry.request.bodySize + responseSize) }}
+          {{ $humanFileSize(headersSize + requestBodySize + responseBodySize) }}
         </span>
       </div>
       <div class="p-1 text-primary" v-if="isDataUrl">

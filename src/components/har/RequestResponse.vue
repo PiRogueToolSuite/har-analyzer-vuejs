@@ -9,22 +9,29 @@ import {Tabs, Tab, TabList, TabPanels, TabPanel, Badge} from "primevue";
 <script>
 export default {
   props: ['entry', 'body'],
-  methods: {}
+  computed: {
+    bodySize() {
+      return this.entry._content?.size ?? this.body?._size ?? this.body?.size ?? this.entry.bodySize ?? 0;
+    },
+    defaultTabId() {
+      return this.bodySize > 0 ? '1' : this.entry.headersSize > 0 ? '0' : null;
+    }
+  }
 }
 </script>
 
 <template>
-  <Tabs value="0">
+  <Tabs :value="defaultTabId">
     <TabList>
-      <Tab value="0">
+      <Tab value="0" v-if="entry.headersSize > 0">
         <span class="pi pi-list"></span>
         Headers
         <Badge :value="$humanFileSize(entry.headersSize)" severity="secondary" size="small"></Badge>
       </Tab>
-      <Tab value="1" v-if="entry.bodySize>0 || body?.size > 0">
+      <Tab value="1" v-if="bodySize > 0">
         <span class="pi pi-file"></span>
         Body
-        <Badge :value="$humanFileSize(body?._size || body?.size)" severity="secondary" size="small"></Badge>
+        <Badge :value="$humanFileSize(bodySize)" severity="secondary" size="small"></Badge>
       </Tab>
       <Tab value="2" v-if="entry._stacktrace">
         <span class="pi pi-sitemap"></span>
@@ -36,10 +43,10 @@ export default {
       </Tab>
     </TabList>
     <TabPanels>
-      <TabPanel value="0">
+      <TabPanel value="0" v-if="entry.headersSize > 0">
         <HttpHeaders :entry="entry"/>
       </TabPanel>
-      <TabPanel value="1" v-if="entry.bodySize>0 || body?.size > 0">
+      <TabPanel value="1" v-if="bodySize > 0">
         <HttpBody :entry="entry" :body="body"/>
       </TabPanel>
       <TabPanel value="2" v-if="entry._stacktrace">

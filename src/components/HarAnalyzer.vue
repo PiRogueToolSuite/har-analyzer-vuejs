@@ -4,7 +4,7 @@ import RequestResponse from "@/components/har/RequestResponse.vue";
 import GeneralInfo from "@/components/har/GeneralInfo.vue";
 import HttpMethod from "@/components/har/partials/HttpMethod.vue";
 import HttpStatus from "@/components/har/partials/HttpStatus.vue";
-import TotalBodySize from "@/components/har/partials/TotalBodySize.vue";
+import TotalSize from "@/components/har/partials/TotalSize.vue";
 import CommunicationLine from "@/components/har/partials/CommunicationLine.vue";
 import SecureHttp from "@/components/har/partials/SecureHttp.vue";
 import Detection from "@/components/har/enrichment/Detection.vue";
@@ -35,6 +35,7 @@ export default {
   },
   methods: {
     setEntries(entriesArray) {
+      this.selectedEntry = null;
       this.entries.splice(0, this.entries.length, ...entriesArray);
     },
   },
@@ -73,14 +74,14 @@ export default {
               <HttpMethod v-model:method="selectedEntry.request.method" v-model:status="selectedEntry.response.status"/>
               <HttpStatus v-model:status="selectedEntry.response.status"/>
               <SecureHttp :request="selectedEntry.request"/>
-              <TotalBodySize v-model:entry="selectedEntry"/>
-              <Tag class="me-1" icon="pi pi-stopwatch" :value="selectedEntry.time+' ms'" severity="secondary"/>
+              <TotalSize v-model:entry="selectedEntry"/>
+              <Tag class="me-1" icon="pi pi-stopwatch" :value="selectedEntry.time.toFixed(1)+' ms'" severity="secondary"/>
             </div>
             <div class="mt-3 mb-0 " v-if="selectedEntry.request._communication">
               <CommunicationLine v-model:entry="selectedEntry.request"/>
             </div>
           </div>
-          <Tabs value="0" class="">
+          <Tabs value="1" class="">
             <TabList>
               <Tab value="0">General</Tab>
               <Tab value="1">Request</Tab>
