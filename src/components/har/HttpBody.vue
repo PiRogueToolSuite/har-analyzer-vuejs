@@ -1,57 +1,46 @@
-<script>
+<script setup>
 import Code from "@/components/har/partials/Code.vue";
+</script>
 
+<script>
 export default {
-  components: {Code},
   props: ['entry', 'body'],
   computed: {
-    decodedContent: function () {
-      const requestBody = this.body?.text;
-      let parsedBody = requestBody;
+    eitherBody: function() {
+      return this.entry._content ?? this.body;
+    },
+    notPrintableBody: function() {
+      return !!this.entry._content || !!this.body?.encoding;
+    },
+    bodyOptionallyIndentedIfJson: function () {
+      const reqOrRespBody = this.body?.text; // only for printable body
       try {
-        const d = JSON.parse(requestBody);
-        return JSON.stringify(d, null, 2);
+        return JSON.stringify(JSON.parse(reqOrRespBody), null, 2);
       } catch {
+        return reqOrRespBody;
       }
-      return parsedBody;
     }
   }
 }
 </script>
 
 <template>
-  <div class="" v-if="entry._content">
-    <div class="">
+  <div>
+    <div class="" v-if="notPrintableBody">
       <span class="pi pi-exclamation-triangle text-orange-400"></span>
       <span class="text-unmuted"> The original data is not printable</span>
     </div>
     <ul class="list-unstyled my-2">
       <li>
         <span class="font-bold text-unmuted">Mimetype: </span>
-        <span class="font-mono">{{ entry._content.mimeType }}</span>
+        <span class="font-monospace">{{ eitherBody.mimeType || '?' }}</span>
       </li>
-      <li>
+      <li v-if="notPrintableBody">
         <span class="font-bold text-unmuted">Encoding: </span>
-        <span class="font-mono">{{ entry._content.encoding }}</span>
+        <span class="font-monospace">{{ eitherBody.encoding }}</span>
       </li>
     </ul>
-    <Code title="Data" :toggleable=false :content="entry._content.text"></Code>
-    <div class="font-bold mb-2 text-unmuted">Data</div>
-    <pre class="text-wrap border border-primary rounded text-unmuted p-2"><code>{{ entry._content.text }}</code></pre>
-  </div>
-  <div class="" v-else>
-    <ul class="my-2 list-unstyled">
-      <li>
-        <span class="fw-bold text-unmuted">Mimetype: </span>
-        <span class="font-monospace">{{ body?.mimeType }}</span>
-      </li>
-      <li v-if="body.encoding">
-        <span class="fw-bold text-unmuted">Encoding: </span>
-        <span class="font-monospace">{{ body?.encoding }}</span>
-      </li>
-    </ul>
-    <div v-if="decodedContent" class="mt-4">
-      <Code title="Data" :content="decodedContent"></Code>
-    </div>
+    <Code title="Data" :toggleable=false :content="eitherBody.text" v-if="notPrintableBody"></Code>
+    <Code title="Data" :toggleable=false :content="bodyOptionallyIndentedIfJson" v-else></Code>
   </div>
 </template>
