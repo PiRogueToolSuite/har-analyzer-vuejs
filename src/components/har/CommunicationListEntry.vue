@@ -10,8 +10,8 @@ export default {
       const url = new URL(this.entry.request.url);
       return url.hostname;
     },
-    isBlocked() {
-      return this.entry.response.bodySize < 0;
+    isAborted() {
+      return !this.entry.response?.status;
     },
     isDataUrl() {
       return this.entry.request?.url?.startsWith('data:');
@@ -25,22 +25,37 @@ export default {
     responseBodySize() {
       return Math.max(0, this.entry.response?.content?.size ?? this.entry.response?.bodySize ?? 0);
     },
+    processName() {
+        const reqProcess = this.entry.request._stacktrace?.process;
+        const respProcess = this.entry.response?._stacktrace?.process;
+        if(!reqProcess) return respProcess;
+        if(!respProcess) return reqProcess;
+        if(reqProcess != respProcess) {
+            console.log(
+                `Ambiguous process name for entry ID ${this.entry._sha1Id} (${reqProcess} != ${respProcess})`
+            );
+        }
+        return reqProcess;
+    }
   }
 }
 </script>
 
 <template>
-  <div class="text-wrap">
+  <div style="white-space: nowrap; overflow-x: hidden;">
     <div class="d-flex flex-row">
+      <div class="p-0" style="vertical-align: sub;" v-if="entry._ogreCrumbs">
+        <img src="/src/assets/ogre_logo_CC_Lima_Studio.svg" height="20"/>
+      </div>
       <div class="p-0 mx-1">
-        <Tag class="" :value="entry.request.method" severity="danger" v-if="entry.response.status>=400"/>
-        <Tag class="" :value="entry.request.method" severity="success" v-else/>
+        <Tag class="" :value="entry.request.method" severity="danger" v-if="isAborted || entry.response.status>=400" />
+        <Tag class="" :value="entry.request.method" severity="success" v-else />
       </div>
       <div class="p-1">
         <span class="pi pi-download text-muted" v-if="isDataUrl"></span>
         <span class="pi pi-cloud-download text-unmuted" v-else></span>
-        <span class="ms-1 text-danger" v-if="isBlocked">
-          Blocked
+        <span class="ms-1 text-danger" v-if="isAborted">
+          Aborted
         </span>
         <span class="ms-1 text-unmuted" v-else>
           {{ $humanFileSize(headersSize + requestBodySize + responseBodySize) }}
@@ -56,19 +71,15 @@ export default {
       </div>
     </div>
     <div class="d-flex flex-row ">
-      <div class="p-1 text-unmuted font-monospace" v-if="entry.request._stacktrace">
+      <div class="p-1 text-unmuted font-monospace" v-if="processName">
         <span class="pi pi-wave-pulse" ></span>
-        <span class="mx-1 text-sm">{{ entry.request._stacktrace.process }}</span>
+        <span class="mx-1 text-sm">{{ processName }}</span>
       </div>
       <div class="p-1 text-unmuted font-monospace" v-else-if="isDataUrl">
         <span class="pi pi-code" ></span>
-        <span class="mx-1 text-sm">Local script</span>
+        <span class="mx-1 text-sm">local script</span>
       </div>
-      <div class="p-1 text-unmuted font-monospace" v-else-if="isBlocked">
-        <span class="pi pi-server" ></span>
-        <span class="mx-1 text-sm text-danger">DNS request blocked</span>
-      </div>
-      <div class="p-1 text-unmuted font-monospace" v-else>
+      <div class="p-1 text-unmuted font-monospace" v-else-if="entry.serverIPAddress">
         <span class="pi pi-server" ></span>
         <span class="mx-1 text-sm">{{ entry.serverIPAddress }}</span>
       </div>

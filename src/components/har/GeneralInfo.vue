@@ -1,9 +1,15 @@
-<script>
+<script setup>
 import CopyBtn from "@/components/har/generic/CopyBtn.vue";
+</script>
 
+<script>
 export default {
-  components: {CopyBtn},
-  props: ['entry']
+  props: ['entry'],
+  computed: {
+    isAborted() {
+      return !this.entry.response?.status;
+    },
+  }
 }
 </script>
 
@@ -19,20 +25,21 @@ export default {
     </li>
     <li>
       <span class="text-unmuted fw-bold">Status</span>:
-      <CopyBtn>{{ entry.response.status }}</CopyBtn>
+      <span class="text-danger" v-if="isAborted">Aborted</span>
+      <CopyBtn v-else>{{ entry.response.status }}</CopyBtn>
     </li>
     <li>
       <span class="text-unmuted fw-bold">Timestamp</span>:
       <CopyBtn>{{ entry.startedDateTime }}</CopyBtn>
     </li>
     <li>
-      <span class="text-unmuted fw-bold">Time</span>:
-      <CopyBtn>{{ entry.time }}ms</CopyBtn>
+      <span class="text-unmuted fw-bold">Duration</span>:
+      <CopyBtn>{{ entry.time.toFixed(2) }}ms</CopyBtn>
     </li>
     <li>
       <span class="text-unmuted fw-bold">Remote IP</span>:
-      <span class="text-danger" v-if="entry.response.bodySize < 0">DNS request blocked</span>
-      <CopyBtn v-else-if="entry.serverIPAddress">{{ entry.serverIPAddress }}</CopyBtn>
+      <CopyBtn v-if="entry.serverIPAddress">{{ entry.serverIPAddress }}</CopyBtn>
+      <span class="text-danger" v-else>unavailable</span>
     </li>
     <li v-if="entry._communityId">
       <span class="text-unmuted fw-bold">Community ID</span>:

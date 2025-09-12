@@ -9,6 +9,7 @@ export default {
 </script>
 
 <template>
-  <Tag class="me-1" icon="pi pi-times" :value="status" severity="danger" v-if="status>=400"/>
-  <Tag class="me-1" icon="pi pi-check" :value="status" severity="success" v-else/>
+  <Tag class="me-1" value="Aborted" severity="danger" v-if="!status" />
+  <Tag class="me-1" icon="pi pi-times" :value="status" severity="danger" v-else-if="status>=400" />
+  <Tag class="me-1" icon="pi pi-check" :value="status" severity="success" v-else />
 </template>

@@ -1,6 +1,8 @@
-<script>
+<script setup>
 import CopyBtn from "@/components/har/generic/CopyBtn.vue";
+</script>
 
+<script>
 export default {
   components: {CopyBtn},
   props: ['entry']
