@@ -22,12 +22,14 @@ export default {
     detections: function () {
       let data = [];
       const sortedObj = this.sortKeys(this.ogre.detected_data);
-      for (const [key, value] of Object.entries(sortedObj)) {
+      for (const [key, values] of Object.entries(sortedObj)) {
+        let exampleValue = values[0].value;
+        let hasMultipleValues = values.length > 1 && values.slice(1).some((v) => v.value != exampleValue);
         data.push({
           type: key,
-          count: value.length,
-          example: value[0].value,
-          details: value
+          count: values.length,
+          example: exampleValue + (hasMultipleValues ? ' ; …': ''),
+          details: values
         })
       }
       return data;

@@ -15,7 +15,7 @@ export default {
 
 <template>
   <ul class="list-unstyled">
-    <li>
+    <li style="word-break: break-all;">
       <span class="text-unmuted fw-bold">URL</span>:
       <CopyBtn>{{ entry.request.url }}</CopyBtn>
     </li>
@@ -48,6 +48,10 @@ export default {
     <li v-if="entry._sha1Id">
       <span class="text-unmuted fw-bold">SHA1</span>:
       <CopyBtn><span class="font-monospace">{{ entry._sha1Id }}</span></CopyBtn>
+    </li>
+    <li v-if="entry._ogreCrumbs?.recipe_id">
+      <span class="text-unmuted fw-bold">Matching Ogre recipe</span>:
+      <CopyBtn><span class="font-monospace">{{ entry._ogreCrumbs.recipe_id }}</span></CopyBtn>
     </li>
   </ul>
 </template>

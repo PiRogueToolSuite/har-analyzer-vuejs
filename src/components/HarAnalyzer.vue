@@ -71,6 +71,7 @@ export default {
               </div>
             </div>
             <div class="text-wrap my-2">
+              <Tag class="me-1 font-monospace" icon="pi pi-book" :value="selectedEntry._ogreCrumbs.recipe_id" severity="warn" v-if="selectedEntry._ogreCrumbs"/>
               <HttpMethod v-model:method="selectedEntry.request.method" v-model:status="selectedEntry.response.status"/>
               <HttpStatus v-model:status="selectedEntry.response.status"/>
               <SecureHttp :request="selectedEntry.request"/>
@@ -109,11 +110,12 @@ export default {
                 </div>
               </TabPanel>
               <TabPanel value="3" v-if="selectedEntry._ogreCrumbs">
-                <div class="m-0">
+                <div class="m-0" v-if="Object.keys(selectedEntry._ogreCrumbs.detected_data).length">
                   <Detection
                     v-model:ogre="selectedEntry._ogreCrumbs"
                     class=""></Detection>
                 </div>
+                <div class="my-3 mx-3 text-muted" v-else>No data identified with current rules &hellip;</div>
               </TabPanel>
             </TabPanels>
           </Tabs>
