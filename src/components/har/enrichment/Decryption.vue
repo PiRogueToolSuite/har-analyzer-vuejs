@@ -1,6 +1,11 @@
+<script setup>
+import Code from "@/components/har/partials/Code.vue";
+</script>
+
 <script>
 export default {
-  props: ['entry']
+  components: {Code},
+  props: ['decryption']
 }
 </script>
 
@@ -9,20 +14,30 @@ export default {
     <ul class="list-unstyled">
       <li class="">
         <span class="fw-bold text-unmuted">Algorithm: </span>
-        <span class="font-monospace">{{ entry._decryption.primitiveParameters.algorithm }}</span>
+        <span class="font-monospace">{{ decryption.primitiveParameters.algorithm || '?' }}</span>
       </li>
       <li class="">
         <span class="fw-bold text-unmuted">Key: </span>
-        <span class="font-monospace">{{ entry._decryption.primitiveParameters.key }}</span>
+        <span class="font-monospace">{{ decryption.primitiveParameters.key || '?' }}</span>
       </li>
       <li class="">
         <span class="fw-bold text-unmuted">IV: </span>
-        <span class="font-monospace">{{ entry._decryption.primitiveParameters.iv }}</span>
+        <span class="font-monospace">{{ decryption.primitiveParameters.iv || '?' }}</span>
+      </li>
+      <li class="" v-if="decryption.sizeDiffEncrypted || decryption.sizeDiffDecrypted">
+        <span class="fw-bold text-unmuted">Sizes differences:</span>
+        <ul>
+          <li v-if="decryption.sizeDiffEncrypted">
+            <span>matching cipher text - original cipher text</span><span class="font-monospace"> = {{ decryption.sizeDiffEncrypted }} bytes</span>
+          </li>
+          <li v-if="decryption.sizeDiffDecrypted">
+            <span>matching plain text - original cipher text</span><span class="font-monospace"> = {{ decryption.sizeDiffDecrypted }} bytes</span>
+          </li>
+        </ul>
       </li>
     </ul>
-    <div class="" v-if="entry._decryption.originalBase64Content">
-      <div class="fw-bold mb-2 text-unmuted">Original data (base64):</div>
-      <pre class="h-100 overflow-auto text-wrap border border-primary text-unmuted rounded p-2"><code>{{ entry._decryption.originalBase64Content }}</code></pre>
+    <div v-if="decryption.originalBase64Content">
+      <Code title="Original data (base64)" :toggleable=false :content="decryption.originalBase64Content"></Code>
     </div>
   </div>
 </template>

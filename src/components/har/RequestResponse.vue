@@ -44,16 +44,16 @@ export default {
     </TabList>
     <TabPanels>
       <TabPanel value="0" v-if="entry.headersSize > 0">
-        <HttpHeaders :entry="entry"/>
+        <HttpHeaders :headers="entry.headers"/>
       </TabPanel>
       <TabPanel value="1" v-if="bodySize > 0">
         <HttpBody :entry="entry" :body="body"/>
       </TabPanel>
       <TabPanel value="2" v-if="entry._stacktrace">
-        <Stacktrace :entry="entry"/>
+        <Stacktrace :stacktrace="entry._stacktrace"/>
       </TabPanel>
       <TabPanel value="3" v-if="entry._decryption">
-        <Decryption :entry="entry"/>
+        <Decryption :decryption="entry._decryption"/>
       </TabPanel>
     </TabPanels>
   </Tabs>

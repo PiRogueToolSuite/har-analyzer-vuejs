@@ -5,17 +5,17 @@ import CopyBtn from "@/components/har/generic/CopyBtn.vue";
 <script>
 export default {
   components: {CopyBtn},
-  props: ['entry']
+  props: ['headers']
 }
 </script>
 
 <template>
 
   <ul class="list-unstyled">
-    <li class="" v-for="st in entry.headers">
+    <li class="" v-for="h in headers">
       <CopyBtn>
-        <span class="fw-bold">{{ st.name }}</span>:
-        <span class="text-break">{{ st.value }}</span>
+        <span class="fw-bold">{{ h.name }}</span>:
+        <span class="text-break">{{ h.value }}</span>
       </CopyBtn>
     </li>
   </ul>
