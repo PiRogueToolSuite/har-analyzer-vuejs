@@ -79,7 +79,8 @@ export default {
               <Tag class="me-1" icon="pi pi-stopwatch" :value="selectedEntry.time.toFixed(1)+' ms'" severity="secondary"/>
             </div>
             <div class="mt-3 mb-0 " v-if="selectedEntry.request._communication">
-              <CommunicationLine v-model:entry="selectedEntry.request"/>
+              <CommunicationLine :communication="selectedEntry.request._communication"
+                                 :stacktrace="selectedEntry.request._stacktrace ?? selectedEntry.response._stacktrace" />
             </div>
           </div>
           <Tabs value="1" class="">
