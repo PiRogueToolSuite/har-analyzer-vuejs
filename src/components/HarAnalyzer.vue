@@ -40,8 +40,21 @@ export default {
     },
   },
   computed: {
+    selectedUrl() {
+        return this.selectedEntry ? new URL(this.selectedEntry.request.url) : null;
+    },
+    selectedUrlSplitted() {
+        if(!this.selectedUrl) return null;
+        const u = new URL(this.selectedUrl); // copy to modify
+        const search = u.search;
+        const searchParams = new URLSearchParams(u.searchParams);
+        const hash = u.hash;
+        u.search = "";
+        u.hash = "";
+        return {main: u.toString(), search, searchParams, hash};
+    },
     isDataUrl() {
-      return this.selectedEntry?.request?.url?.startsWith('data:');
+      return this.selectedUrl?.protocol == 'data:';
     },
   }
 }
@@ -65,9 +78,26 @@ export default {
                 <span class="pi pi-file" style="font-size: 1rem"></span>
                 <span class="mx-2 font-monospace">local content</span>
               </div>
-              <div v-else>
-                <span class="pi pi-globe" style="font-size: 1rem"></span>
-                <span class="mx-2 font-monospace">{{ selectedEntry.request.url }}</span>
+              <div style="word-break: break-all;" v-else>
+                <div>
+                  <span class="pi pi-globe" style="font-size: 1rem"></span>
+                  <span class="mx-2 font-monospace">{{ selectedUrlSplitted.main }}</span>
+                </div>
+                <div v-if="selectedUrlSplitted.search">
+                  <span class="pi pi-question" style="font-size: 1rem"></span>
+                  <span class="mx-2 font-monospace kv-list">
+                    <span class="mx-1" v-for="([k, v], ix) in selectedUrlSplitted.searchParams.entries()">
+                      <span style="font-size: 0;" v-if="ix>0">&amp;</span><!-- for proper copies -->
+                      <span class="kv-key">{{ k }}</span>
+                      <span class="mx-1">=</span>
+                      <span class="kv-value">{{ v }}</span>
+                    </span>
+                  </span>
+                </div>
+                <div v-if="selectedUrlSplitted.hash">
+                  <span class="pi pi-hashtag" style="font-size: 1rem"></span>
+                  <span class="mx-2 font-monospace">{{ selectedUrlSplitted.hash.slice(1) }}</span>
+                </div>
               </div>
             </div>
             <div class="text-wrap my-2">

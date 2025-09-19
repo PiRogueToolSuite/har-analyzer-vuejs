@@ -4,6 +4,15 @@
   .no-border {
     border: none !important;
   }
+  .kv-list::before {
+    content: "[";
+  }
+  .kv-list::after {
+    content: "]";
+  }
+  .kv-key {
+    font-weight: bold;
+  }
 }
 
 /*
